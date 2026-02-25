@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Planificador Interactivo - Prof. de Teatro UPC</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f8f9fa;}
+        #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10;}
+        #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; }
+        h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 5px;}
+        h3 { color: #34495e; font-size: 14px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        
+        .plan-selector { background: #eef2f5; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #dcdde1; }
+        .plan-selector label { font-size: 13px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 8px;}
+        .plan-btn { width: 100%; padding: 6px; margin-bottom: 5px; cursor: pointer; border: 1px solid #bdc3c7; background: #fff; border-radius: 4px; font-size: 12px; transition: 0.2s;}
+        .plan-btn.active { background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold;}
+
+        .subject-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
+        .subject-item label { font-size: 13px; display: block; margin-bottom: 4px; font-weight: 600; color: #444;}
+        .controls { font-size: 12px; display: flex; gap: 10px; }
+        .controls label { font-weight: normal; cursor: pointer; }
+        .legend { margin-top: 15px; margin-bottom: 25px; font-size: 12px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;}
+        .leg-item { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;}
+        .leg-border { border: 3px solid; background: #fff; box-sizing: border-box; border-radius: 3px;}
+        .leg-bg { border-radius: 50%; border: 1px solid #ccc;}
+        .legend-row { margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+
+<div id="panel">
+    <h2>Mi Trayectoria</h2>
+    
+    <div class="plan-selector">
+        <label>Régimen de Correlatividades:</label>
+        <button id="btn-2023" class="plan-btn active" onclick="switchPlan('2023')">Plan 2023 (Res. 0339 - Ingresantes hasta 2025)</button>
+        <button id="btn-2025" class="plan-btn" onclick="switchPlan('2025')">Plan 2025 (Res. 441 - Ingresantes 2026+)</button>
+    </div>
+
+    <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 15px;">Tu progreso se guarda automáticamente.</p>
+    
+    <div class="legend">
+        <h3>Área de la Materia (Borde)</h3>
+        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #2196F3;"></span> Específica de Teatro</div>
+        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #FF9800;"></span> Prácticas Docentes</div>
+        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #9E9E9E;"></span> Tronco Común</div>
+        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #4CAF50;"></span> Seminarios / Optativas</div>
+        
+        <h3 style="margin-top: 15px;">Estado (Color de Fondo)</h3>
+        <div class="legend-row"><span class="leg-item leg-bg" style="background: #e0e0e0;"></span> Bloqueada</div>
+        <div class="legend-row"><span class="leg-item leg-bg" style="background: #ffeb3b;"></span> Habilitada para Cursar</div>
+        <div class="legend-row"><span class="leg-item leg-bg" style="background: #8bc34a;"></span> Regularizada (Puede Rendir)</div>
+        <div class="legend-row"><span class="leg-item leg-bg" style="background: #4caf50; border-color: #388e3c;"></span> Aprobada</div>
+    </div>
+
+    <div id="controls-container"></div>
+</div>
+
+<div id="mynetwork"></div>
+
+<script>
+    const catColors = { comun: "#9E9E9E", practica: "#FF9800", especifica: "#2196F3", optativa: "#4CAF50" };
+
+    const subjectsData = [
+        {id: 1, label: "01-Pedagogía", year: 1, cat: "comun"},
+        {id: 2, label: "02-Perspectivas Socio.", year: 1, cat: "comun"},
+        {id: 3, label: "03-Problemáticas artes", year: 1, cat: "comun"},
+        {id: 4, label: "04-Práctica Docente 1", year: 1, cat: "practica"},
+        {id: 5, label: "05-Actuación 1", year: 1, cat: "especifica"},
+        {id: 6, label: "06-Dramaturgias 1", year: 1, cat: "especifica"},
+        {id: 7, label: "07-La voz 1", year: 1, cat: "especifica"},
+        {id: 8, label: "08-Escenotecnia 1", year: 1, cat: "especifica"},
+        {id: 9, label: "09-Teatro objetos", year: 1, cat: "especifica"},
+        {id: 10, label: "10-Escuela espectad.", year: 1, cat: "especifica"},
+        {id: 11, label: "11-Didáctica Gral.", year: 2, cat: "comun"},
+        {id: 12, label: "12-Sujetos Educ.", year: 2, cat: "comun"},
+        {id: 13, label: "13-Práctica Docente 2", year: 2, cat: "practica"},
+        {id: 14, label: "14-Actuación 2", year: 2, cat: "especifica"},
+        {id: 15, label: "15-Música escena", year: 2, cat: "especifica"},
+        {id: 16, label: "16-Historia prácticas", year: 2, cat: "comun"},
+        {id: 17, label: "17-Dramaturgias 2", year: 2, cat: "especifica"},
+        {id: 18, label: "18-La voz 2", year: 2, cat: "especifica"},
+        {id: 19, label: "19-Escenotecnia 2", year: 2, cat: "especifica"},
+        {id: 20, label: "20-Teatrología", year: 2, cat: "especifica"},
+        {id: 21, label: "21-Juego dramático", year: 2, cat: "especifica"},
+        {id: 22, label: "22-Optativa 1", year: 2, cat: "optativa"},
+        {id: 23, label: "23-Psicología art.", year: 3, cat: "comun"},
+        {id: 24, label: "24-ESI", year: 3, cat: "comun"},
+        {id: 25, label: "25-Práctica Docente 3", year: 3, cat: "practica"},
+        {id: 26, label: "26-Actuación 3", year: 3, cat: "especifica"},
+        {id: 27, label: "27-Poéticas contemp.", year: 3, cat: "especifica"},
+        {id: 28, label: "28-Prácticas integradas", year: 3, cat: "optativa"},
+        {id: 29, label: "29-Dramaturgias 3", year: 3, cat: "especifica"},
+        {id: 30, label: "30-La voz 3", year: 3, cat: "especifica"},
+        {id: 31, label: "31-Escenotecnia 3", year: 3, cat: "especifica"},
+        {id: 32, label: "32-Clown", year: 3, cat: "especifica"},
+        {id: 33, label: "33-Teatro argentino", year: 3, cat: "especifica"}, 
+        {id: 34, label: "34-Textos teatrales", year: 3, cat: "especifica"}, 
+        {id: 35, label: "35-Didáctica primaria", year: 3, cat: "especifica"},
+        {id: 36, label: "36-Arte y discap.", year: 4, cat: "optativa"},
+        {id: 37, label: "37-Filosofía", year: 4, cat: "comun"},
+        {id: 38, label: "38-Práct. vinculación", year: 4, cat: "optativa"},
+        {id: 39, label: "39-Práctica Docente 4", year: 4, cat: "practica"},
+        {id: 40, label: "40-Investigación artes", year: 4, cat: "optativa"},
+        {id: 41, label: "41-Producción art.", year: 4, cat: "especifica"},
+        {id: 42, label: "42-Actuación 4", year: 4, cat: "especifica"},
+        {id: 43, label: "43-Dirección", year: 4, cat: "especifica"},
+        {id: 44, label: "44-Canto teatral", year: 4, cat: "especifica"},
+        {id: 45, label: "45-Improvisación", year: 4, cat: "especifica"},
+        {id: 46, label: "46-Didáctica sec.", year: 4, cat: "especifica"},
+        {id: 47, label: "47-Optativa 2", year: 4, cat: "optativa"}
+    ];
+
+    const correlativas = {
+        "2023": { 
+            13: { reqCursarReg: [4], reqRendirApr: [1, 4] },
+            14: { reqCursarReg: [5], reqRendirApr: [5] },
+            17: { reqCursarReg: [6], reqRendirApr: [6] },
+            18: { reqCursarReg: [7], reqRendirApr: [7] },
+            19: { reqCursarReg: [8], reqRendirApr: [8] },
+            20: { reqCursarReg: [10] },
+            25: { reqCursarReg: [13], reqRendirApr: [11, 13, 21, 35] },
+            26: { reqCursarReg: [14], reqRendirApr: [14] },
+            27: { reqCursarApr: [20] },
+            28: { reqCursarReg: [14, 15, 19] },
+            29: { reqCursarReg: [17], reqRendirApr: [17] },
+            30: { reqCursarReg: [14, 18], reqRendirApr: [18] },
+            31: { reqCursarReg: [15, 19], reqRendirApr: [19] },
+            32: { reqCursarReg: [4, 14] },
+            33: { reqRendirApr: [16] },
+            34: { reqRendirApr: [10, 20] },
+            35: { reqCursarApr: [11], reqRendirApr: [21] },
+            39: { reqCursarReg: [24, 25, 27], reqCursarApr: [3], reqRendirApr: [25, 46] },
+            40: { reqCursarApr: [3] },
+            41: { reqCursarReg: [26, 28, 31], reqRendirReg: [43] },
+            42: { reqCursarReg: [26, 30], reqRendirApr: [26, 30] },
+            43: { reqCursarReg: [27, 28, 31] },
+            44: { reqCursarReg: [15, 30], reqRendirApr: [15, 30] },
+            45: { reqCursarReg: [32] },
+            46: { reqRendirApr: [35] }
+        },
+        "2025": { 
+            13: { reqCursarReg: [4], reqRendirApr: [1, 4] },
+            14: { reqCursarReg: [5], reqRendirApr: [5] },
+            16: { reqRendirApr: [3] },
+            17: { reqCursarReg: [6], reqRendirApr: [6] },
+            18: { reqCursarReg: [7], reqRendirApr: [7] },
+            19: { reqCursarReg: [8], reqRendirApr: [8] },
+            20: { reqCursarReg: [10] }, 
+            25: { reqCursarReg: [13], reqRendirApr: [11, 13, 21] },
+            26: { reqCursarReg: [14], reqRendirApr: [14] },
+            27: { reqCursarApr: [20] },
+            28: { reqCursarReg: [14, 15, 19] },
+            29: { reqCursarReg: [17], reqRendirApr: [17] },
+            30: { reqCursarReg: [18], reqRendirApr: [18] },
+            31: { reqCursarReg: [19], reqRendirApr: [19] },
+            32: { reqCursarApr: [5] },
+            33: { reqCursarApr: [3], reqRendirApr: [16] },
+            34: { reqCursarApr: [3], reqRendirApr: [16, 20] }, 
+            35: { reqCursarApr: [11], reqRendirApr: [21] },
+            39: { reqCursarReg: [24, 25, 27], reqRendirApr: [25] },
+            40: { reqCursarApr: [3] },
+            41: { reqCursarReg: [26, 31], reqCursarApr: [34] },
+            42: { reqCursarReg: [26, 30], reqRendirApr: [26, 30] },
+            43: { reqCursarReg: [27, 31] },
+            44: { reqCursarReg: [15], reqRendirApr: [15] },
+            45: { reqCursarReg: [32] },
+            46: { reqRendirApr: [35] }
+        }
+    };
+
+    let currentPlan = "2023";
+    let studentState = {};
+    let oldColors = {}; // Para detectar cambios y activar el brillo
+    let yearCounts = {1:0, 2:0, 3:0, 4:0};
+
+    // Cargar progreso
+    let savedData = localStorage.getItem('teatro_progress');
+    if(savedData) studentState = JSON.parse(savedData);
+
+    const container = document.getElementById('controls-container');
+    
+    function getSubjectName(id) {
+        let sub = subjectsData.find(s => s.id === id);
+        return sub ? sub.label : id;
+    }
+
+    function buildTooltipText(sub) {
+        let text = sub.label + "\n----------------------------------------\n";
+        let reqs = correlativas[currentPlan][sub.id] || {};
+        let hasReqs = false;
+        if (reqs.reqCursarReg && reqs.reqCursarReg.length > 0) { text += "[Para Cursar] Regulares previas:\n  • " + reqs.reqCursarReg.map(id => getSubjectName(id)).join('\n  • ') + "\n\n"; hasReqs = true; }
+        if (reqs.reqCursarApr && reqs.reqCursarApr.length > 0) { text += "[Para Cursar] Aprobadas previas:\n  • " + reqs.reqCursarApr.map(id => getSubjectName(id)).join('\n  • ') + "\n\n"; hasReqs = true; }
+        if (reqs.reqRendirReg && reqs.reqRendirReg.length > 0) { text += "[Para Rendir] Regulares previas:\n  • " + reqs.reqRendirReg.map(id => getSubjectName(id)).join('\n  • ') + "\n"; hasReqs = true; }
+        if (reqs.reqRendirApr && reqs.reqRendirApr.length > 0) { text += "[Para Rendir] Aprobadas previas:\n  • " + reqs.reqRendirApr.map(id => getSubjectName(id)).join('\n  • ') + "\n"; hasReqs = true; }
+        if (!hasReqs) text += "Sin correlativas previas en este Plan.";
+        return text;
+    }
+
+    subjectsData.forEach(sub => {
+        if(!studentState[sub.id]) studentState[sub.id] = { regular: false, aprobada: false };
+        sub.yIndex = yearCounts[sub.year]++; 
+        let div = document.createElement('div');
+        div.className = 'subject-item';
+        div.innerHTML = `
+            <label>${sub.label}</label>
+            <div class="controls">
+                <label><input type="checkbox" id="reg-${sub.id}" ${studentState[sub.id].regular ? 'checked' : ''} onclick="toggleState(${sub.id}, 'regular')"> Regular</label>
+                <label><input type="checkbox" id="apr-${sub.id}" ${studentState[sub.id].aprobada ? 'checked' : ''} onclick="toggleState(${sub.id}, 'aprobada')"> Aprobada</label>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    let nodes = new vis.DataSet([]);
+    let edges = new vis.DataSet([]);
+    let containerNetwork = document.getElementById("mynetwork");
+    
+    let options = {
+        physics: false,
+        interaction: { hover: true, hoverConnectedEdges: true, selectConnectedEdges: true, tooltipDelay: 100 },
+        edges: { smooth: { type: "cubicBezier", forceDirection: "horizontal", roundness: 0.5 }, color: { color: "#b0bec5", hover: "#e74c3c", highlight: "#c0392b", opacity: 0.6 }, width: 2, hoverWidth: 3, selectionWidth: 3, arrows: { to: { enabled: true, scaleFactor: 0.6 } } },
+        nodes: { shape: "box", borderWidth: 3, font: { size: 12, face: "Segoe UI", color: "#222", bold: true }, margin: { top: 10, right: 15, bottom: 10, left: 15 }, shadow: { enabled: true, color: "rgba(0,0,0,0.1)", size: 5, x: 2, y: 2 } }
+    };
+    let network = new vis.Network(containerNetwork, { nodes: nodes, edges: edges }, options);
+
+    // Función que calcula el color según las reglas
+    function calculateBgColor(subId, reqs) {
+        let estado = studentState[subId];
+        if (estado.aprobada) return "#4caf50";
+        let canCursar = true;
+        let canRendir = estado.regular;
+        if(reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canCursar = false; });
+        if(reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { if(!studentState[reqId].aprobada) canCursar = false; });
+        if(reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canRendir = false; });
+        if(reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { if(!studentState[reqId].aprobada) canRendir = false; });
+
+        if(estado.regular && canRendir) return "#8bc34a"; 
+        if(estado.regular && !canRendir) return "#ff9800"; 
+        if(!estado.regular && canCursar) return "#ffeb3b"; 
+        return "#e0e0e0";
+    }
+
+    // Inicializa la red desde cero (Dibuja flechas y centra la cámara)
+    function initNetwork() {
+        let newNodes = [];
+        let newEdges = [];
+
+        subjectsData.forEach(sub => {
+            let reqs = correlativas[currentPlan][sub.id] || {};
+            let bgColor = calculateBgColor(sub.id, reqs);
+            oldColors[sub.id] = bgColor; // Guardamos el color inicial
+
+            // Fórmula matemática para que se dibuje centrado en el medio de la pantalla
+            let xPos = (sub.year - 2.5) * 350; 
+            let yPos = (sub.yIndex - (yearCounts[sub.year] / 2)) * 80;      
+
+            newNodes.push({ 
+                id: sub.id, label: sub.label, title: buildTooltipText(sub), 
+                x: xPos, y: yPos,      
+                color: { background: bgColor, border: catColors[sub.cat], hover: { background: bgColor, border: "#e74c3c" }, highlight: { background: bgColor, border: "#c0392b" } }
+            });
+
+            if (reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id }); });
+            if (reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id, dashes: true }); });
+        });
+        
+        nodes.clear(); edges.clear();
+        nodes.add(newNodes); edges.add(newEdges);
+        
+        // Forza el centrado suave de la cámara al iniciar
+        setTimeout(() => { network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); }, 100);
+    }
+
+    // Actualiza los colores con un "Destello" sin mover la cámara
+    function updateStatesSilently() {
+        let updates = [];
+        let glowUpdates = [];
+        let revertUpdates = [];
+
+        subjectsData.forEach(sub => {
+            let reqs = correlativas[currentPlan][sub.id] || {};
+            let newBgColor = calculateBgColor(sub.id, reqs);
+
+            if (oldColors[sub.id] !== newBgColor) {
+                // Si la materia cambió de estado, la hacemos brillar temporalmente
+                glowUpdates.push({
+                    id: sub.id,
+                    color: { background: newBgColor, border: "#ffc107" },
+                    borderWidth: 6,
+                    shadow: { enabled: true, color: "#ffc107", size: 30, x: 0, y: 0 }
+                });
+                // Datos para volverla a la normalidad
+                revertUpdates.push({
+                    id: sub.id,
+                    color: { background: newBgColor, border: catColors[sub.cat] },
+                    borderWidth: 3,
+                    shadow: { enabled: true, color: "rgba(0,0,0,0.1)", size: 5, x: 2, y: 2 }
+                });
+                oldColors[sub.id] = newBgColor;
+            } else {
+                // Actualización silenciosa de aquellas que no cambiaron (por si cambió el Tooltip)
+                updates.push({ id: sub.id, color: { background: newBgColor }});
+            }
+        });
+
+        // Aplica colores base
+        nodes.update(updates);
+        
+        // Aplica el brillo a las modificadas
+        if (glowUpdates.length > 0) {
+            nodes.update(glowUpdates);
+            // Quita el brillo después de 1.2 segundos
+            setTimeout(() => { nodes.update(revertUpdates); }, 1200);
+        }
+    }
+
+    // Manejo de clics en el menú
+    window.toggleState = function(id, type) {
+        let isChecked = document.getElementById(`${type === 'regular' ? 'reg' : 'apr'}-${id}`).checked;
+        studentState[id][type] = isChecked;
+        
+        if(type === 'aprobada' && isChecked) {
+            document.getElementById(`reg-${id}`).checked = true;
+            studentState[id].regular = true;
+        }
+        if(type === 'regular' && !isChecked) {
+            document.getElementById(`apr-${id}`).checked = false;
+            studentState[id].aprobada = false;
+        }
+        
+        localStorage.setItem('teatro_progress', JSON.stringify(studentState));
+        updateStatesSilently(); // Llamamos a la actualización con efecto Glow
+    };
+
+    // Manejo de clic en los planes de estudio
+    window.switchPlan = function(plan) {
+        currentPlan = plan;
+        document.getElementById('btn-2023').className = plan === '2023' ? 'plan-btn active' : 'plan-btn';
+        document.getElementById('btn-2025').className = plan === '2025' ? 'plan-btn active' : 'plan-btn';
+        initNetwork(); // Acá sí redibujamos las flechas porque cambiaron las reglas
+    };
+
+    // Dibujado inicial al cargar la web
+    initNetwork();
+</script>
+</body>
+</html>
