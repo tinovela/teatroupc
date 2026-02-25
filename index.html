@@ -6,7 +6,7 @@
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f8f9fa;}
-        #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10;}
+        #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column;}
         #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; }
         h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 5px;}
         h3 { color: #34495e; font-size: 14px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
@@ -25,36 +25,51 @@
         .leg-border { border: 3px solid; background: #fff; box-sizing: border-box; border-radius: 3px;}
         .leg-bg { border-radius: 50%; border: 1px solid #ccc;}
         .legend-row { margin-bottom: 6px; }
+        .dashed-box { border: 2px dashed #999; display: inline-block; width: 24px; height: 10px; margin-right: 6px; vertical-align: middle;}
+        .solid-box { border: 2px solid #999; display: inline-block; width: 24px; height: 10px; margin-right: 6px; vertical-align: middle;}
+        
+        #controls-container { flex-grow: 1; }
+        .credits { margin-top: 20px; text-align: center; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
 </head>
 <body>
 
 <div id="panel">
-    <h2>Mi Trayectoria</h2>
-    
-    <div class="plan-selector">
-        <label>Régimen de Correlatividades:</label>
-        <button id="btn-2023" class="plan-btn active" onclick="switchPlan('2023')">Plan 2023 (Res. 0339 - Ingresantes hasta 2025)</button>
-        <button id="btn-2025" class="plan-btn" onclick="switchPlan('2025')">Plan 2025 (Res. 441 - Ingresantes 2026+)</button>
-    </div>
-
-    <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 15px;">Tu progreso se guarda automáticamente.</p>
-    
-    <div class="legend">
-        <h3>Área de la Materia (Borde)</h3>
-        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #2196F3;"></span> Específica de Teatro</div>
-        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #FF9800;"></span> Prácticas Docentes</div>
-        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #9E9E9E;"></span> Tronco Común</div>
-        <div class="legend-row"><span class="leg-item leg-border" style="border-color: #4CAF50;"></span> Seminarios / Optativas</div>
+    <div>
+        <h2>Mi Trayectoria</h2>
         
-        <h3 style="margin-top: 15px;">Estado (Color de Fondo)</h3>
-        <div class="legend-row"><span class="leg-item leg-bg" style="background: #e0e0e0;"></span> Bloqueada</div>
-        <div class="legend-row"><span class="leg-item leg-bg" style="background: #ffeb3b;"></span> Habilitada para Cursar</div>
-        <div class="legend-row"><span class="leg-item leg-bg" style="background: #8bc34a;"></span> Regularizada (Puede Rendir)</div>
-        <div class="legend-row"><span class="leg-item leg-bg" style="background: #4caf50; border-color: #388e3c;"></span> Aprobada</div>
+        <div class="plan-selector">
+            <label>Régimen de Correlatividades:</label>
+            <button id="btn-2023" class="plan-btn active" onclick="switchPlan('2023')">Plan 2023 (Res. 0339 - Ingreso hasta 2025)</button>
+            <button id="btn-2025" class="plan-btn" onclick="switchPlan('2025')">Plan 2025 (Res. 441 - Ingreso 2026+)</button>
+        </div>
+
+        <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 15px;">Tu progreso se guarda automáticamente.</p>
+        
+        <div class="legend">
+            <h3>Área de la Materia (Color de Borde)</h3>
+            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #2196F3;"></span> Específica de Teatro</div>
+            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #FF9800;"></span> Prácticas Docentes</div>
+            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #9E9E9E;"></span> Tronco Común</div>
+            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #4CAF50;"></span> Seminarios / Optativas</div>
+            
+            <h3 style="margin-top: 15px;">Duración (Estilo de Borde)</h3>
+            <div class="legend-row"><span class="solid-box"></span> Anual</div>
+            <div class="legend-row"><span class="dashed-box"></span> Cuatrimestral</div>
+
+            <h3 style="margin-top: 15px;">Estado (Color de Fondo)</h3>
+            <div class="legend-row"><span class="leg-item leg-bg" style="background: #e0e0e0;"></span> Bloqueada</div>
+            <div class="legend-row"><span class="leg-item leg-bg" style="background: #ffeb3b;"></span> Habilitada para Cursar</div>
+            <div class="legend-row"><span class="leg-item leg-bg" style="background: #8bc34a;"></span> Regularizada (Puede Rendir)</div>
+            <div class="legend-row"><span class="leg-item leg-bg" style="background: #4caf50; border-color: #388e3c;"></span> Aprobada</div>
+        </div>
     </div>
 
     <div id="controls-container"></div>
+    
+    <div class="credits">
+        Desarrollado por Tino Velástico - Profesorado de Teatro UPC
+    </div>
 </div>
 
 <div id="mynetwork"></div>
@@ -63,53 +78,60 @@
     const catColors = { comun: "#9E9E9E", practica: "#FF9800", especifica: "#2196F3", optativa: "#4CAF50" };
 
     const subjectsData = [
-        {id: 1, label: "01-Pedagogía", year: 1, cat: "comun"},
-        {id: 2, label: "02-Perspectivas Socio.", year: 1, cat: "comun"},
-        {id: 3, label: "03-Problemáticas artes", year: 1, cat: "comun"},
-        {id: 4, label: "04-Práctica Docente 1", year: 1, cat: "practica"},
-        {id: 5, label: "05-Actuación 1", year: 1, cat: "especifica"},
-        {id: 6, label: "06-Dramaturgias 1", year: 1, cat: "especifica"},
-        {id: 7, label: "07-La voz 1", year: 1, cat: "especifica"},
-        {id: 8, label: "08-Escenotecnia 1", year: 1, cat: "especifica"},
-        {id: 9, label: "09-Teatro objetos", year: 1, cat: "especifica"},
-        {id: 10, label: "10-Escuela espectad.", year: 1, cat: "especifica"},
-        {id: 11, label: "11-Didáctica Gral.", year: 2, cat: "comun"},
-        {id: 12, label: "12-Sujetos Educ.", year: 2, cat: "comun"},
-        {id: 13, label: "13-Práctica Docente 2", year: 2, cat: "practica"},
-        {id: 14, label: "14-Actuación 2", year: 2, cat: "especifica"},
-        {id: 15, label: "15-Música escena", year: 2, cat: "especifica"},
-        {id: 16, label: "16-Historia prácticas", year: 2, cat: "comun"},
-        {id: 17, label: "17-Dramaturgias 2", year: 2, cat: "especifica"},
-        {id: 18, label: "18-La voz 2", year: 2, cat: "especifica"},
-        {id: 19, label: "19-Escenotecnia 2", year: 2, cat: "especifica"},
-        {id: 20, label: "20-Teatrología", year: 2, cat: "especifica"},
-        {id: 21, label: "21-Juego dramático", year: 2, cat: "especifica"},
-        {id: 22, label: "22-Optativa 1", year: 2, cat: "optativa"},
-        {id: 23, label: "23-Psicología art.", year: 3, cat: "comun"},
-        {id: 24, label: "24-ESI", year: 3, cat: "comun"},
-        {id: 25, label: "25-Práctica Docente 3", year: 3, cat: "practica"},
-        {id: 26, label: "26-Actuación 3", year: 3, cat: "especifica"},
-        {id: 27, label: "27-Poéticas contemp.", year: 3, cat: "especifica"},
-        {id: 28, label: "28-Prácticas integradas", year: 3, cat: "optativa"},
-        {id: 29, label: "29-Dramaturgias 3", year: 3, cat: "especifica"},
-        {id: 30, label: "30-La voz 3", year: 3, cat: "especifica"},
-        {id: 31, label: "31-Escenotecnia 3", year: 3, cat: "especifica"},
-        {id: 32, label: "32-Clown", year: 3, cat: "especifica"},
-        {id: 33, label: "33-Teatro argentino", year: 3, cat: "especifica"}, 
-        {id: 34, label: "34-Textos teatrales", year: 3, cat: "especifica"}, 
-        {id: 35, label: "35-Didáctica primaria", year: 3, cat: "especifica"},
-        {id: 36, label: "36-Arte y discap.", year: 4, cat: "optativa"},
-        {id: 37, label: "37-Filosofía", year: 4, cat: "comun"},
-        {id: 38, label: "38-Práct. vinculación", year: 4, cat: "optativa"},
-        {id: 39, label: "39-Práctica Docente 4", year: 4, cat: "practica"},
-        {id: 40, label: "40-Investigación artes", year: 4, cat: "optativa"},
-        {id: 41, label: "41-Producción art.", year: 4, cat: "especifica"},
-        {id: 42, label: "42-Actuación 4", year: 4, cat: "especifica"},
-        {id: 43, label: "43-Dirección", year: 4, cat: "especifica"},
-        {id: 44, label: "44-Canto teatral", year: 4, cat: "especifica"},
-        {id: 45, label: "45-Improvisación", year: 4, cat: "especifica"},
-        {id: 46, label: "46-Didáctica sec.", year: 4, cat: "especifica"},
-        {id: 47, label: "47-Optativa 2", year: 4, cat: "optativa"}
+        // AÑO 1
+        {id: 1, label: "01-Pedagogía", year: 1, cat: "comun", dur: "Anual"},
+        {id: 2, label: "02-Perspectivas Socio.", year: 1, cat: "comun", dur: "Anual"},
+        {id: 3, label: "03-Problemáticas artes", year: 1, cat: "comun", dur: "Anual"},
+        {id: 4, label: "04-Práctica Docente 1", year: 1, cat: "practica", dur: "Anual"},
+        {id: 5, label: "05-Actuación 1", year: 1, cat: "especifica", dur: "Anual"},
+        {id: 6, label: "06-Dramaturgias 1", year: 1, cat: "especifica", dur: "Anual"},
+        {id: 7, label: "07-La voz 1", year: 1, cat: "especifica", dur: "Anual"},
+        {id: 8, label: "08-Escenotecnia 1", year: 1, cat: "especifica", dur: "Anual"},
+        {id: 9, label: "09-Teatro objetos", year: 1, cat: "especifica", dur: "Anual"},
+        {id: 10, label: "10-Escuela espectad.", year: 1, cat: "especifica", dur: "Cuatrimestral"},
+        
+        // AÑO 2
+        {id: 11, label: "11-Didáctica Gral.", year: 2, cat: "comun", dur: "Anual"},
+        {id: 12, label: "12-Sujetos Educ.", year: 2, cat: "comun", dur: "Cuatrimestral"},
+        {id: 13, label: "13-Práctica Docente 2", year: 2, cat: "practica", dur: "Anual"},
+        {id: 14, label: "14-Actuación 2", year: 2, cat: "especifica", dur: "Anual"},
+        {id: 15, label: "15-Música escena", year: 2, cat: "especifica", dur: "Anual"},
+        {id: 16, label: "16-Historia prácticas", year: 2, cat: "comun", dur: "Anual"},
+        {id: 17, label: "17-Dramaturgias 2", year: 2, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 18, label: "18-La voz 2", year: 2, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 19, label: "19-Escenotecnia 2", year: 2, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 20, label: "20-Teatrología", year: 2, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 21, label: "21-Juego dramático", year: 2, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 22, label: "22-Optativa 1", year: 2, cat: "optativa", dur: "Cuatrimestral"},
+        
+        // AÑO 3
+        {id: 23, label: "23-Psicología art.", year: 3, cat: "comun", dur: "Anual"},
+        {id: 24, label: "24-ESI", year: 3, cat: "comun", dur: "Anual"},
+        {id: 25, label: "25-Práctica Docente 3", year: 3, cat: "practica", dur: "Anual"},
+        {id: 26, label: "26-Actuación 3", year: 3, cat: "especifica", dur: "Anual"},
+        {id: 27, label: "27-Poéticas contemp.", year: 3, cat: "especifica", dur: "Anual"},
+        {id: 28, label: "28-Prácticas integradas", year: 3, cat: "optativa", dur: "Cuatrimestral"},
+        {id: 29, label: "29-Dramaturgias 3", year: 3, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 30, label: "30-La voz 3", year: 3, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 31, label: "31-Escenotecnia 3", year: 3, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 32, label: "32-Clown", year: 3, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 33, label: "33-Teatro argentino", year: 3, cat: "especifica", dur: "Cuatrimestral"}, 
+        {id: 34, label: "34-Textos teatrales", year: 3, cat: "especifica", dur: "Cuatrimestral"}, 
+        {id: 35, label: "35-Didáctica primaria", year: 3, cat: "especifica", dur: "Cuatrimestral"},
+        
+        // AÑO 4
+        {id: 36, label: "36-Arte y discap.", year: 4, cat: "optativa", dur: "Anual"},
+        {id: 37, label: "37-Filosofía", year: 4, cat: "comun", dur: "Anual"},
+        {id: 38, label: "38-Práct. vinculación", year: 4, cat: "optativa", dur: "Cuatrimestral"},
+        {id: 39, label: "39-Práctica Docente 4", year: 4, cat: "practica", dur: "Anual"},
+        {id: 40, label: "40-Investigación artes", year: 4, cat: "optativa", dur: "Anual"},
+        {id: 41, label: "41-Producción art.", year: 4, cat: "especifica", dur: "Anual"},
+        {id: 42, label: "42-Actuación 4", year: 4, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 43, label: "43-Dirección", year: 4, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 44, label: "44-Canto teatral", year: 4, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 45, label: "45-Improvisación", year: 4, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 46, label: "46-Didáctica sec.", year: 4, cat: "especifica", dur: "Cuatrimestral"},
+        {id: 47, label: "47-Optativa 2", year: 4, cat: "optativa", dur: "Cuatrimestral"}
     ];
 
     const correlativas = {
@@ -172,10 +194,9 @@
 
     let currentPlan = "2023";
     let studentState = {};
-    let oldColors = {}; // Para detectar cambios y activar el brillo
+    let oldColors = {}; 
     let yearCounts = {1:0, 2:0, 3:0, 4:0};
 
-    // Cargar progreso
     let savedData = localStorage.getItem('teatro_progress');
     if(savedData) studentState = JSON.parse(savedData);
 
@@ -187,7 +208,9 @@
     }
 
     function buildTooltipText(sub) {
-        let text = sub.label + "\n----------------------------------------\n";
+        let text = sub.label + "\n";
+        text += "Duración: " + sub.dur + "\n";
+        text += "----------------------------------------\n";
         let reqs = correlativas[currentPlan][sub.id] || {};
         let hasReqs = false;
         if (reqs.reqCursarReg && reqs.reqCursarReg.length > 0) { text += "[Para Cursar] Regulares previas:\n  • " + reqs.reqCursarReg.map(id => getSubjectName(id)).join('\n  • ') + "\n\n"; hasReqs = true; }
@@ -204,7 +227,7 @@
         let div = document.createElement('div');
         div.className = 'subject-item';
         div.innerHTML = `
-            <label>${sub.label}</label>
+            <label>${sub.label} <span style="font-weight:normal; color:#888;">(${sub.dur === 'Anual' ? 'A' : 'C'})</span></label>
             <div class="controls">
                 <label><input type="checkbox" id="reg-${sub.id}" ${studentState[sub.id].regular ? 'checked' : ''} onclick="toggleState(${sub.id}, 'regular')"> Regular</label>
                 <label><input type="checkbox" id="apr-${sub.id}" ${studentState[sub.id].aprobada ? 'checked' : ''} onclick="toggleState(${sub.id}, 'aprobada')"> Aprobada</label>
@@ -225,7 +248,6 @@
     };
     let network = new vis.Network(containerNetwork, { nodes: nodes, edges: edges }, options);
 
-    // Función que calcula el color según las reglas
     function calculateBgColor(subId, reqs) {
         let estado = studentState[subId];
         if (estado.aprobada) return "#4caf50";
@@ -242,7 +264,6 @@
         return "#e0e0e0";
     }
 
-    // Inicializa la red desde cero (Dibuja flechas y centra la cámara)
     function initNetwork() {
         let newNodes = [];
         let newEdges = [];
@@ -250,15 +271,15 @@
         subjectsData.forEach(sub => {
             let reqs = correlativas[currentPlan][sub.id] || {};
             let bgColor = calculateBgColor(sub.id, reqs);
-            oldColors[sub.id] = bgColor; // Guardamos el color inicial
+            oldColors[sub.id] = bgColor;
 
-            // Fórmula matemática para que se dibuje centrado en el medio de la pantalla
             let xPos = (sub.year - 2.5) * 350; 
             let yPos = (sub.yIndex - (yearCounts[sub.year] / 2)) * 80;      
 
             newNodes.push({ 
                 id: sub.id, label: sub.label, title: buildTooltipText(sub), 
                 x: xPos, y: yPos,      
+                shapeProperties: { borderDashes: sub.dur === 'Cuatrimestral' ? [5, 5] : false }, 
                 color: { background: bgColor, border: catColors[sub.cat], hover: { background: bgColor, border: "#e74c3c" }, highlight: { background: bgColor, border: "#c0392b" } }
             });
 
@@ -269,11 +290,9 @@
         nodes.clear(); edges.clear();
         nodes.add(newNodes); edges.add(newEdges);
         
-        // Forza el centrado suave de la cámara al iniciar
         setTimeout(() => { network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); }, 100);
     }
 
-    // Actualiza los colores con un "Destello" sin mover la cámara
     function updateStatesSilently() {
         let updates = [];
         let glowUpdates = [];
@@ -284,14 +303,12 @@
             let newBgColor = calculateBgColor(sub.id, reqs);
 
             if (oldColors[sub.id] !== newBgColor) {
-                // Si la materia cambió de estado, la hacemos brillar temporalmente
                 glowUpdates.push({
                     id: sub.id,
                     color: { background: newBgColor, border: "#ffc107" },
                     borderWidth: 6,
                     shadow: { enabled: true, color: "#ffc107", size: 30, x: 0, y: 0 }
                 });
-                // Datos para volverla a la normalidad
                 revertUpdates.push({
                     id: sub.id,
                     color: { background: newBgColor, border: catColors[sub.cat] },
@@ -300,23 +317,17 @@
                 });
                 oldColors[sub.id] = newBgColor;
             } else {
-                // Actualización silenciosa de aquellas que no cambiaron (por si cambió el Tooltip)
                 updates.push({ id: sub.id, color: { background: newBgColor }});
             }
         });
 
-        // Aplica colores base
         nodes.update(updates);
-        
-        // Aplica el brillo a las modificadas
         if (glowUpdates.length > 0) {
             nodes.update(glowUpdates);
-            // Quita el brillo después de 1.2 segundos
             setTimeout(() => { nodes.update(revertUpdates); }, 1200);
         }
     }
 
-    // Manejo de clics en el menú
     window.toggleState = function(id, type) {
         let isChecked = document.getElementById(`${type === 'regular' ? 'reg' : 'apr'}-${id}`).checked;
         studentState[id][type] = isChecked;
@@ -331,18 +342,16 @@
         }
         
         localStorage.setItem('teatro_progress', JSON.stringify(studentState));
-        updateStatesSilently(); // Llamamos a la actualización con efecto Glow
+        updateStatesSilently();
     };
 
-    // Manejo de clic en los planes de estudio
     window.switchPlan = function(plan) {
         currentPlan = plan;
         document.getElementById('btn-2023').className = plan === '2023' ? 'plan-btn active' : 'plan-btn';
         document.getElementById('btn-2025').className = plan === '2025' ? 'plan-btn active' : 'plan-btn';
-        initNetwork(); // Acá sí redibujamos las flechas porque cambiaron las reglas
+        initNetwork(); 
     };
 
-    // Dibujado inicial al cargar la web
     initNetwork();
 </script>
 </body>
