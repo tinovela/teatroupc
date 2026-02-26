@@ -55,7 +55,7 @@
                 left: 0; 
                 width: 100%; 
                 min-width: 100%; 
-                height: 45dvh; /* Altura inicial */
+                height: 45dvh; 
                 box-shadow: 0 -4px 15px rgba(0,0,0,0.15); 
                 border-radius: 20px 20px 0 0;
             }
@@ -102,7 +102,7 @@
         <div id="controls-container"></div>
         
         <div class="credits">
-            Desarrollado por [Tu Nombre Aquí] - Profesorado de Teatro UPC
+            Desarrollado por Tino Velástico - Profesorado de Teatro UPC
         </div>
     </div>
 </div>
@@ -128,7 +128,6 @@
         let newHeight = startHeight + deltaY;
         let windowHeight = window.innerHeight;
         
-        // Restricciones: Mínimo 70px (solo manija y título), Máximo 85% de la pantalla
         if (newHeight < 70) newHeight = 70;
         if (newHeight > windowHeight * 0.85) newHeight = windowHeight * 0.85;
         
@@ -139,12 +138,10 @@
         isDragging = false;
     }
 
-    // Eventos Táctiles (Celulares)
     handle.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), {passive: true});
     document.addEventListener('touchmove', (e) => isDragging && onDrag(e.touches[0].clientY), {passive: true});
     document.addEventListener('touchend', endDrag);
 
-    // Eventos de Mouse (Simulación en PC)
     handle.addEventListener('mousedown', (e) => startDrag(e.clientY));
     document.addEventListener('mousemove', (e) => isDragging && onDrag(e.clientY));
     document.addEventListener('mouseup', endDrag);
@@ -311,7 +308,13 @@
     
     let options = {
         physics: false,
-        interaction: { hover: true, hoverConnectedEdges: true, selectConnectedEdges: true, tooltipDelay: 100 },
+        interaction: { 
+            dragNodes: false, // ¡Bloquea el movimiento de las materias!
+            hover: true, 
+            hoverConnectedEdges: true, 
+            selectConnectedEdges: true, 
+            tooltipDelay: 100 
+        },
         edges: { 
             smooth: { type: "cubicBezier", forceDirection: "horizontal", roundness: 0.5 }, 
             hoverWidth: 3, 
@@ -376,7 +379,6 @@
         nodes.clear(); edges.clear();
         nodes.add(newNodes); edges.add(newEdges);
         
-        // Se dibuja y se encuadra SÓLO AL INICIAR o al CAMBIAR de Plan
         setTimeout(() => { 
             network.redraw(); 
             network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); 
@@ -411,7 +413,6 @@
             }
         });
 
-        // NOTA: Acá ya NO llamamos a network.fit(), por ende no te quita el zoom
         nodes.update(updates);
         if (glowUpdates.length > 0) {
             nodes.update(glowUpdates);
