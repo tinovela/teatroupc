@@ -20,7 +20,7 @@
         .subject-item label { font-size: 13px; display: block; margin-bottom: 4px; font-weight: 600; color: #444;}
         .controls { font-size: 12px; display: flex; gap: 10px; }
         .controls label { font-weight: normal; cursor: pointer; }
-        .legend { margin-top: 15px; margin-bottom: 25px; font-size: 12px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;}
+        .legend { margin-top: 15px; margin-bottom: 25px; font-size: 12px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e9ecef;}
         .leg-item { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;}
         .leg-border { border: 3px solid; background: #fff; box-sizing: border-box; border-radius: 3px;}
         .leg-bg { border-radius: 50%; border: 1px solid #ccc;}
@@ -28,6 +28,11 @@
         .dashed-box { border: 2px dashed #999; display: inline-block; width: 24px; height: 10px; margin-right: 6px; vertical-align: middle;}
         .solid-box { border: 2px solid #999; display: inline-block; width: 24px; height: 10px; margin-right: 6px; vertical-align: middle;}
         
+        /* Flechas para la leyenda */
+        .line-cursar-reg { display:inline-block; width: 20px; border-top: 3px solid #b0bec5; vertical-align: middle; margin-right: 5px; }
+        .line-cursar-apr { display:inline-block; width: 20px; border-top: 3px dashed #e74c3c; vertical-align: middle; margin-right: 5px; }
+        .line-rendir { display:inline-block; width: 20px; border-top: 2px dotted #9c27b0; vertical-align: middle; margin-right: 5px; }
+
         #controls-container { flex-grow: 1; }
         .credits { margin-top: 20px; text-align: center; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
@@ -44,24 +49,25 @@
             <button id="btn-2025" class="plan-btn" onclick="switchPlan('2025')">Plan 2025 (Res. 441 - Ingreso 2026+)</button>
         </div>
 
-        <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 15px;">Tu progreso se guarda automáticamente.</p>
+        <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 10px;">Tu progreso se guarda automáticamente.</p>
         
         <div class="legend">
-            <h3>Área de la Materia (Color de Borde)</h3>
-            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #2196F3;"></span> Específica de Teatro</div>
-            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #FF9800;"></span> Prácticas Docentes</div>
-            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #9E9E9E;"></span> Tronco Común</div>
-            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #4CAF50;"></span> Seminarios / Optativas</div>
-            
-            <h3 style="margin-top: 15px;">Duración (Estilo de Borde)</h3>
-            <div class="legend-row"><span class="solid-box"></span> Anual</div>
-            <div class="legend-row"><span class="dashed-box"></span> Cuatrimestral</div>
-
-            <h3 style="margin-top: 15px;">Estado (Color de Fondo)</h3>
+            <h3>Estado de la Materia</h3>
             <div class="legend-row"><span class="leg-item leg-bg" style="background: #e0e0e0;"></span> Bloqueada</div>
             <div class="legend-row"><span class="leg-item leg-bg" style="background: #ffeb3b;"></span> Habilitada para Cursar</div>
-            <div class="legend-row"><span class="leg-item leg-bg" style="background: #8bc34a;"></span> Regularizada (Puede Rendir)</div>
+            <div class="legend-row"><span class="leg-item leg-bg" style="background: #ffb74d;"></span> Reg. (Falta final previo)</div>
+            <div class="legend-row"><span class="leg-item leg-bg" style="background: #c5e1a5;"></span> Regularizada (Puede Rendir)</div>
             <div class="legend-row"><span class="leg-item leg-bg" style="background: #4caf50; border-color: #388e3c;"></span> Aprobada</div>
+
+            <h3 style="margin-top: 15px;">Conexiones (Pasa el mouse)</h3>
+            <div class="legend-row"><span class="line-cursar-reg"></span> Cursar (Req. Regular)</div>
+            <div class="legend-row"><span class="line-cursar-apr"></span> Cursar (Req. Aprobada)</div>
+            <div class="legend-row"><span class="line-rendir"></span> Para Rendir Final (Violeta)</div>
+
+            <h3 style="margin-top: 15px;">Área y Duración</h3>
+            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #2196F3;"></span> Teatro &nbsp; | &nbsp; <span class="leg-item leg-border" style="border-color: #9E9E9E;"></span> Común</div>
+            <div class="legend-row"><span class="leg-item leg-border" style="border-color: #FF9800;"></span> Práctica | &nbsp; <span class="leg-item leg-border" style="border-color: #4CAF50;"></span> Optativa</div>
+            <div style="margin-top:5px;"><span class="solid-box"></span> Anual &nbsp;&nbsp;&nbsp; | &nbsp; <span class="dashed-box"></span> Cuatrim.</div>
         </div>
     </div>
 
@@ -78,7 +84,6 @@
     const catColors = { comun: "#9E9E9E", practica: "#FF9800", especifica: "#2196F3", optativa: "#4CAF50" };
 
     const subjectsData = [
-        // AÑO 1
         {id: 1, label: "01-Pedagogía", year: 1, cat: "comun", dur: "Anual"},
         {id: 2, label: "02-Perspectivas Socio.", year: 1, cat: "comun", dur: "Anual"},
         {id: 3, label: "03-Problemáticas artes", year: 1, cat: "comun", dur: "Anual"},
@@ -89,8 +94,6 @@
         {id: 8, label: "08-Escenotecnia 1", year: 1, cat: "especifica", dur: "Anual"},
         {id: 9, label: "09-Teatro objetos", year: 1, cat: "especifica", dur: "Anual"},
         {id: 10, label: "10-Escuela espectad.", year: 1, cat: "especifica", dur: "Cuatrimestral"},
-        
-        // AÑO 2
         {id: 11, label: "11-Didáctica Gral.", year: 2, cat: "comun", dur: "Anual"},
         {id: 12, label: "12-Sujetos Educ.", year: 2, cat: "comun", dur: "Cuatrimestral"},
         {id: 13, label: "13-Práctica Docente 2", year: 2, cat: "practica", dur: "Anual"},
@@ -103,8 +106,6 @@
         {id: 20, label: "20-Teatrología", year: 2, cat: "especifica", dur: "Cuatrimestral"},
         {id: 21, label: "21-Juego dramático", year: 2, cat: "especifica", dur: "Cuatrimestral"},
         {id: 22, label: "22-Optativa 1", year: 2, cat: "optativa", dur: "Cuatrimestral"},
-        
-        // AÑO 3
         {id: 23, label: "23-Psicología art.", year: 3, cat: "comun", dur: "Anual"},
         {id: 24, label: "24-ESI", year: 3, cat: "comun", dur: "Anual"},
         {id: 25, label: "25-Práctica Docente 3", year: 3, cat: "practica", dur: "Anual"},
@@ -118,8 +119,6 @@
         {id: 33, label: "33-Teatro argentino", year: 3, cat: "especifica", dur: "Cuatrimestral"}, 
         {id: 34, label: "34-Textos teatrales", year: 3, cat: "especifica", dur: "Cuatrimestral"}, 
         {id: 35, label: "35-Didáctica primaria", year: 3, cat: "especifica", dur: "Cuatrimestral"},
-        
-        // AÑO 4
         {id: 36, label: "36-Arte y discap.", year: 4, cat: "optativa", dur: "Anual"},
         {id: 37, label: "37-Filosofía", year: 4, cat: "comun", dur: "Anual"},
         {id: 38, label: "38-Práct. vinculación", year: 4, cat: "optativa", dur: "Cuatrimestral"},
@@ -240,28 +239,36 @@
     let edges = new vis.DataSet([]);
     let containerNetwork = document.getElementById("mynetwork");
     
+    // Opciones del grafo con hover en bordes habilitado
     let options = {
         physics: false,
         interaction: { hover: true, hoverConnectedEdges: true, selectConnectedEdges: true, tooltipDelay: 100 },
-        edges: { smooth: { type: "cubicBezier", forceDirection: "horizontal", roundness: 0.5 }, color: { color: "#b0bec5", hover: "#e74c3c", highlight: "#c0392b", opacity: 0.6 }, width: 2, hoverWidth: 3, selectionWidth: 3, arrows: { to: { enabled: true, scaleFactor: 0.6 } } },
+        edges: { 
+            smooth: { type: "cubicBezier", forceDirection: "horizontal", roundness: 0.5 }, 
+            hoverWidth: 3, 
+            selectionWidth: 3, 
+            arrows: { to: { enabled: true, scaleFactor: 0.6 } } 
+        },
         nodes: { shape: "box", borderWidth: 3, font: { size: 12, face: "Segoe UI", color: "#222", bold: true }, margin: { top: 10, right: 15, bottom: 10, left: 15 }, shadow: { enabled: true, color: "rgba(0,0,0,0.1)", size: 5, x: 2, y: 2 } }
     };
     let network = new vis.Network(containerNetwork, { nodes: nodes, edges: edges }, options);
 
     function calculateBgColor(subId, reqs) {
         let estado = studentState[subId];
-        if (estado.aprobada) return "#4caf50";
+        if (estado.aprobada) return "#4caf50"; // Verde clásico fuerte
+        
         let canCursar = true;
         let canRendir = estado.regular;
+        
         if(reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canCursar = false; });
         if(reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { if(!studentState[reqId].aprobada) canCursar = false; });
         if(reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canRendir = false; });
         if(reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { if(!studentState[reqId].aprobada) canRendir = false; });
 
-        if(estado.regular && canRendir) return "#8bc34a"; 
-        if(estado.regular && !canRendir) return "#ff9800"; 
-        if(!estado.regular && canCursar) return "#ffeb3b"; 
-        return "#e0e0e0";
+        if(estado.regular && canRendir) return "#c5e1a5"; // Verde claro pastel (MÁS CONTRASTE)
+        if(estado.regular && !canRendir) return "#ffb74d"; // Naranja (Regular pero bloqueada para rendir)
+        if(!estado.regular && canCursar) return "#ffeb3b"; // Amarillo
+        return "#e0e0e0"; // Gris (Bloqueada)
     }
 
     function initNetwork() {
@@ -283,8 +290,22 @@
                 color: { background: bgColor, border: catColors[sub.cat], hover: { background: bgColor, border: "#e74c3c" }, highlight: { background: bgColor, border: "#c0392b" } }
             });
 
-            if (reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id }); });
-            if (reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id, dashes: true }); });
+            // Flechas de Cursado Regular (Gris sólido -> Rojo en hover)
+            if (reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { 
+                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(176, 190, 197, 0.9)", hover: "#e74c3c", highlight: "#c0392b" }, width: 2 }); 
+            });
+            // Flechas de Cursado Aprobada (Rojo punteado -> Rojo en hover)
+            if (reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { 
+                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(231, 76, 60, 0.7)", hover: "#e74c3c", highlight: "#c0392b" }, dashes: [5, 5], width: 2 }); 
+            });
+            // Flechas para Rendir Regular (Violeta tenue y punteado -> Violeta vibrante en hover)
+            if (reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { 
+                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); 
+            });
+            // Flechas para Rendir Aprobada (Violeta tenue y punteado -> Violeta vibrante en hover)
+            if (reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { 
+                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); 
+            });
         });
         
         nodes.clear(); edges.clear();
