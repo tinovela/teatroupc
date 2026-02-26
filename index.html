@@ -7,8 +7,17 @@
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: row; margin: 0; padding: 0; height: 100vh; height: 100dvh; overflow: hidden; background-color: #f8f9fa;}
-        #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column;}
-        #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; position: relative;}
+        
+        #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; position: relative; z-index: 1;}
+        
+        #panel { width: 360px; min-width: 360px; background: #fff; box-shadow: 3px 0 10px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 10; display: flex; flex-direction: column; overflow: hidden;}
+        
+        #drag-handle { display: none; width: 100%; padding: 12px 0; cursor: grab; justify-content: center; align-items: center; flex-shrink: 0; background: #fff; z-index: 20;}
+        #drag-handle span { display: block; width: 45px; height: 6px; background: #bdc3c7; border-radius: 10px; }
+        #drag-handle:active { cursor: grabbing; }
+
+        #panel-scroll-area { padding: 0 20px 20px 20px; overflow-y: auto; flex-grow: 1; }
+
         h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 10px;}
         h3 { color: #34495e; font-size: 14px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
         
@@ -33,27 +42,34 @@
         .line-cursar-apr { display:inline-block; width: 20px; border-top: 3px dashed #e74c3c; vertical-align: middle; margin-right: 5px; }
         .line-rendir { display:inline-block; width: 20px; border-top: 2px dotted #9c27b0; vertical-align: middle; margin-right: 5px; }
 
-        #controls-container { flex-grow: 1; }
         .credits { margin-top: 20px; text-align: center; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
         
-        #toggle-btn { display: none; width: 100%; background: #2c3e50; color: #fff; border: none; padding: 12px; font-weight: bold; border-radius: 5px; margin-bottom: 15px; cursor: pointer; text-align: center; }
-
-        /* Estilos Responsivos Corregidos para Celulares */
+        /* Estilos Responsivos Mejorados para Celulares (Bottom Sheet) */
         @media (max-width: 768px) {
-            body { flex-direction: column; height: 100dvh; }
-            #mynetwork { width: 100%; flex-grow: 1; min-height: 45%; order: 1; }
-            #panel { width: 100%; min-width: 100%; height: 50%; flex-shrink: 0; order: 2; box-shadow: 0 -3px 10px rgba(0,0,0,0.15); padding: 15px; transition: height 0.35s ease; }
-            #panel.collapsed { height: 75px; padding-bottom: 5px; overflow: hidden; }
-            #toggle-btn { display: block; }
+            body { display: block; }
+            #mynetwork { width: 100%; height: 100dvh; position: absolute; top: 0; left: 0; }
+            
+            #panel { 
+                position: absolute; 
+                bottom: 0; 
+                left: 0; 
+                width: 100%; 
+                min-width: 100%; 
+                height: 45dvh; /* Altura inicial */
+                box-shadow: 0 -4px 15px rgba(0,0,0,0.15); 
+                border-radius: 20px 20px 0 0;
+            }
+            #drag-handle { display: flex; }
+            #panel-scroll-area { padding-top: 0; }
         }
     </style>
 </head>
 <body>
 
 <div id="panel">
-    <button id="toggle-btn" onclick="toggleMobilePanel()">⬇ Ocultar Panel de Controles</button>
+    <div id="drag-handle"><span></span></div>
     
-    <div id="panel-content">
+    <div id="panel-scroll-area">
         <h2>Mi Trayectoria</h2>
         
         <div class="plan-selector">
@@ -82,18 +98,59 @@
             <div class="legend-row"><span class="leg-item leg-border" style="border-color: #FF9800;"></span> Práctica | &nbsp; <span class="leg-item leg-border" style="border-color: #4CAF50;"></span> Optativa</div>
             <div style="margin-top:5px;"><span class="solid-box"></span> Anual &nbsp;&nbsp;&nbsp; | &nbsp; <span class="dashed-box"></span> Cuatrim.</div>
         </div>
-    </div>
 
-    <div id="controls-container"></div>
-    
-    <div class="credits">
-        Desarrollado por [Tu Nombre Aquí] - Profesorado de Teatro UPC
+        <div id="controls-container"></div>
+        
+        <div class="credits">
+            Desarrollado por [Tu Nombre Aquí] - Profesorado de Teatro UPC
+        </div>
     </div>
 </div>
 
 <div id="mynetwork"></div>
 
 <script>
+    // --- LÓGICA DEL PANEL DESLIZABLE (BOTTOM SHEET) ---
+    const panel = document.getElementById('panel');
+    const handle = document.getElementById('drag-handle');
+    let isDragging = false;
+    let startY, startHeight;
+
+    function startDrag(y) {
+        isDragging = true;
+        startY = y;
+        startHeight = panel.getBoundingClientRect().height;
+    }
+
+    function onDrag(y) {
+        if (!isDragging) return;
+        let deltaY = startY - y;
+        let newHeight = startHeight + deltaY;
+        let windowHeight = window.innerHeight;
+        
+        // Restricciones: Mínimo 70px (solo manija y título), Máximo 85% de la pantalla
+        if (newHeight < 70) newHeight = 70;
+        if (newHeight > windowHeight * 0.85) newHeight = windowHeight * 0.85;
+        
+        panel.style.height = newHeight + 'px';
+    }
+
+    function endDrag() {
+        isDragging = false;
+    }
+
+    // Eventos Táctiles (Celulares)
+    handle.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), {passive: true});
+    document.addEventListener('touchmove', (e) => isDragging && onDrag(e.touches[0].clientY), {passive: true});
+    document.addEventListener('touchend', endDrag);
+
+    // Eventos de Mouse (Simulación en PC)
+    handle.addEventListener('mousedown', (e) => startDrag(e.clientY));
+    document.addEventListener('mousemove', (e) => isDragging && onDrag(e.clientY));
+    document.addEventListener('mouseup', endDrag);
+
+
+    // --- LÓGICA DEL PLAN DE ESTUDIOS ---
     const catColors = { comun: "#9E9E9E", practica: "#FF9800", especifica: "#2196F3", optativa: "#4CAF50" };
 
     const subjectsData = [
@@ -319,11 +376,11 @@
         nodes.clear(); edges.clear();
         nodes.add(newNodes); edges.add(newEdges);
         
-        // Timeout robusto para asegurar que dibuja en celulares y ajusta la cámara
+        // Se dibuja y se encuadra SÓLO AL INICIAR o al CAMBIAR de Plan
         setTimeout(() => { 
             network.redraw(); 
             network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); 
-        }, 300);
+        }, 100);
     }
 
     function updateStatesSilently() {
@@ -354,6 +411,7 @@
             }
         });
 
+        // NOTA: Acá ya NO llamamos a network.fit(), por ende no te quita el zoom
         nodes.update(updates);
         if (glowUpdates.length > 0) {
             nodes.update(glowUpdates);
@@ -383,19 +441,6 @@
         document.getElementById('btn-2023').className = plan === '2023' ? 'plan-btn active' : 'plan-btn';
         document.getElementById('btn-2025').className = plan === '2025' ? 'plan-btn active' : 'plan-btn';
         initNetwork(); 
-    };
-
-    window.toggleMobilePanel = function() {
-        const panel = document.getElementById('panel');
-        const btn = document.getElementById('toggle-btn');
-        panel.classList.toggle('collapsed');
-        if (panel.classList.contains('collapsed')) {
-            btn.innerHTML = "⬆ Mostrar Panel de Controles";
-        } else {
-            btn.innerHTML = "⬇ Ocultar Panel de Controles";
-        }
-        // Fuerza al grafico a redibujarse cuando el contenedor cambia de tamaño
-        setTimeout(() => { network.redraw(); network.fit({ animation: { duration: 500 } }); }, 350);
     };
 
     initNetwork();
