@@ -9,12 +9,12 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: row; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f8f9fa;}
         #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column;}
         #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; }
-        h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 5px;}
+        h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 10px;}
         h3 { color: #34495e; font-size: 14px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
         
-        .plan-selector { background: #eef2f5; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #dcdde1; }
-        .plan-selector label { font-size: 13px; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 8px;}
-        .plan-btn { width: 100%; padding: 6px; margin-bottom: 5px; cursor: pointer; border: 1px solid #bdc3c7; background: #fff; border-radius: 4px; font-size: 12px; transition: 0.2s;}
+        .plan-selector { background: #eef2f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 2px solid #b0bec5; }
+        .plan-selector label { font-size: 14px; font-weight: bold; color: #c0392b; display: block; margin-bottom: 10px; text-align: center;}
+        .plan-btn { width: 100%; padding: 8px; margin-bottom: 5px; cursor: pointer; border: 1px solid #bdc3c7; background: #fff; border-radius: 4px; font-size: 12px; transition: 0.2s;}
         .plan-btn.active { background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold;}
 
         .subject-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
@@ -29,30 +29,35 @@
         .dashed-box { border: 2px dashed #999; display: inline-block; width: 24px; height: 10px; margin-right: 6px; vertical-align: middle;}
         .solid-box { border: 2px solid #999; display: inline-block; width: 24px; height: 10px; margin-right: 6px; vertical-align: middle;}
         
-        /* Flechas para la leyenda */
         .line-cursar-reg { display:inline-block; width: 20px; border-top: 3px solid #b0bec5; vertical-align: middle; margin-right: 5px; }
         .line-cursar-apr { display:inline-block; width: 20px; border-top: 3px dashed #e74c3c; vertical-align: middle; margin-right: 5px; }
         .line-rendir { display:inline-block; width: 20px; border-top: 2px dotted #9c27b0; vertical-align: middle; margin-right: 5px; }
 
         #controls-container { flex-grow: 1; }
         .credits { margin-top: 20px; text-align: center; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
+        
+        #toggle-btn { display: none; width: 100%; background: #2c3e50; color: #fff; border: none; padding: 12px; font-weight: bold; border-radius: 5px; margin-bottom: 15px; cursor: pointer; text-align: center; }
 
         /* Estilos Responsivos para Celulares */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            #mynetwork { width: 100%; height: 50vh; order: 1; }
-            #panel { width: 100%; min-width: 100%; height: 50vh; order: 2; box-shadow: 0 -3px 10px rgba(0,0,0,0.1); padding: 15px; }
+            #mynetwork { flex-grow: 1; height: auto; order: 1; }
+            #panel { width: 100%; min-width: 100%; height: 50vh; order: 2; box-shadow: 0 -3px 10px rgba(0,0,0,0.1); padding: 15px; transition: height 0.3s ease; }
+            #panel.collapsed { height: 70px; padding-bottom: 5px; overflow: hidden; }
+            #toggle-btn { display: block; }
         }
     </style>
 </head>
 <body>
 
 <div id="panel">
-    <div>
+    <button id="toggle-btn" onclick="toggleMobilePanel()">⬇ Ocultar Panel de Controles</button>
+    
+    <div id="panel-content">
         <h2>Mi Trayectoria</h2>
         
         <div class="plan-selector">
-            <label>Régimen de Correlatividades:</label>
+            <label>Elegir régimen de correlatividades 👇</label>
             <button id="btn-2023" class="plan-btn active" onclick="switchPlan('2023')">Plan 2023 (Res. 0339 - Ingreso hasta 2025)</button>
             <button id="btn-2025" class="plan-btn" onclick="switchPlan('2025')">Plan 2025 (Res. 441 - Ingreso 2026+)</button>
         </div>
@@ -374,6 +379,18 @@
         document.getElementById('btn-2023').className = plan === '2023' ? 'plan-btn active' : 'plan-btn';
         document.getElementById('btn-2025').className = plan === '2025' ? 'plan-btn active' : 'plan-btn';
         initNetwork(); 
+    };
+
+    window.toggleMobilePanel = function() {
+        const panel = document.getElementById('panel');
+        const btn = document.getElementById('toggle-btn');
+        panel.classList.toggle('collapsed');
+        if (panel.classList.contains('collapsed')) {
+            btn.innerHTML = "⬆ Mostrar Panel de Controles";
+        } else {
+            btn.innerHTML = "⬇ Ocultar Panel de Controles";
+        }
+        setTimeout(() => { network.fit({ animation: { duration: 500 } }); }, 350);
     };
 
     initNetwork();
