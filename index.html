@@ -6,9 +6,9 @@
     <title>Planificador Interactivo - Prof. de Teatro UPC</title>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: row; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f8f9fa;}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: row; margin: 0; padding: 0; height: 100vh; height: 100dvh; overflow: hidden; background-color: #f8f9fa;}
         #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column;}
-        #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; }
+        #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; position: relative;}
         h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 10px;}
         h3 { color: #34495e; font-size: 14px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
         
@@ -38,12 +38,12 @@
         
         #toggle-btn { display: none; width: 100%; background: #2c3e50; color: #fff; border: none; padding: 12px; font-weight: bold; border-radius: 5px; margin-bottom: 15px; cursor: pointer; text-align: center; }
 
-        /* Estilos Responsivos para Celulares */
+        /* Estilos Responsivos Corregidos para Celulares */
         @media (max-width: 768px) {
-            body { flex-direction: column; }
-            #mynetwork { flex-grow: 1; height: auto; order: 1; }
-            #panel { width: 100%; min-width: 100%; height: 50vh; order: 2; box-shadow: 0 -3px 10px rgba(0,0,0,0.1); padding: 15px; transition: height 0.3s ease; }
-            #panel.collapsed { height: 70px; padding-bottom: 5px; overflow: hidden; }
+            body { flex-direction: column; height: 100dvh; }
+            #mynetwork { width: 100%; flex-grow: 1; min-height: 45%; order: 1; }
+            #panel { width: 100%; min-width: 100%; height: 50%; flex-shrink: 0; order: 2; box-shadow: 0 -3px 10px rgba(0,0,0,0.15); padding: 15px; transition: height 0.35s ease; }
+            #panel.collapsed { height: 75px; padding-bottom: 5px; overflow: hidden; }
             #toggle-btn { display: block; }
         }
     </style>
@@ -319,7 +319,11 @@
         nodes.clear(); edges.clear();
         nodes.add(newNodes); edges.add(newEdges);
         
-        setTimeout(() => { network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); }, 100);
+        // Timeout robusto para asegurar que dibuja en celulares y ajusta la cámara
+        setTimeout(() => { 
+            network.redraw(); 
+            network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); 
+        }, 300);
     }
 
     function updateStatesSilently() {
@@ -390,7 +394,8 @@
         } else {
             btn.innerHTML = "⬇ Ocultar Panel de Controles";
         }
-        setTimeout(() => { network.fit({ animation: { duration: 500 } }); }, 350);
+        // Fuerza al grafico a redibujarse cuando el contenedor cambia de tamaño
+        setTimeout(() => { network.redraw(); network.fit({ animation: { duration: 500 } }); }, 350);
     };
 
     initNetwork();
