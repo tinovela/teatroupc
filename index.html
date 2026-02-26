@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Planificador Interactivo - Prof. de Teatro UPC</title>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f8f9fa;}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: row; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f8f9fa;}
         #panel { width: 360px; min-width: 360px; background: #fff; padding: 20px; box-shadow: 3px 0 10px rgba(0,0,0,0.1); overflow-y: auto; box-sizing: border-box; z-index: 10; display: flex; flex-direction: column;}
         #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; }
         h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 5px;}
@@ -35,6 +36,13 @@
 
         #controls-container { flex-grow: 1; }
         .credits { margin-top: 20px; text-align: center; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
+
+        /* Estilos Responsivos para Celulares */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #mynetwork { width: 100%; height: 50vh; order: 1; }
+            #panel { width: 100%; min-width: 100%; height: 50vh; order: 2; box-shadow: 0 -3px 10px rgba(0,0,0,0.1); padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -74,7 +82,7 @@
     <div id="controls-container"></div>
     
     <div class="credits">
-        Desarrollado por Tino Velástico - Profesorado de Teatro UPC
+        Desarrollado por [Tu Nombre Aquí] - Profesorado de Teatro UPC
     </div>
 </div>
 
@@ -239,7 +247,6 @@
     let edges = new vis.DataSet([]);
     let containerNetwork = document.getElementById("mynetwork");
     
-    // Opciones del grafo con hover en bordes habilitado
     let options = {
         physics: false,
         interaction: { hover: true, hoverConnectedEdges: true, selectConnectedEdges: true, tooltipDelay: 100 },
@@ -255,7 +262,7 @@
 
     function calculateBgColor(subId, reqs) {
         let estado = studentState[subId];
-        if (estado.aprobada) return "#4caf50"; // Verde clásico fuerte
+        if (estado.aprobada) return "#4caf50"; 
         
         let canCursar = true;
         let canRendir = estado.regular;
@@ -265,10 +272,10 @@
         if(reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canRendir = false; });
         if(reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { if(!studentState[reqId].aprobada) canRendir = false; });
 
-        if(estado.regular && canRendir) return "#c5e1a5"; // Verde claro pastel (MÁS CONTRASTE)
-        if(estado.regular && !canRendir) return "#ffb74d"; // Naranja (Regular pero bloqueada para rendir)
-        if(!estado.regular && canCursar) return "#ffeb3b"; // Amarillo
-        return "#e0e0e0"; // Gris (Bloqueada)
+        if(estado.regular && canRendir) return "#c5e1a5"; 
+        if(estado.regular && !canRendir) return "#ffb74d"; 
+        if(!estado.regular && canCursar) return "#ffeb3b"; 
+        return "#e0e0e0"; 
     }
 
     function initNetwork() {
@@ -290,19 +297,15 @@
                 color: { background: bgColor, border: catColors[sub.cat], hover: { background: bgColor, border: "#e74c3c" }, highlight: { background: bgColor, border: "#c0392b" } }
             });
 
-            // Flechas de Cursado Regular (Gris sólido -> Rojo en hover)
             if (reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { 
                 newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(176, 190, 197, 0.9)", hover: "#e74c3c", highlight: "#c0392b" }, width: 2 }); 
             });
-            // Flechas de Cursado Aprobada (Rojo punteado -> Rojo en hover)
             if (reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { 
                 newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(231, 76, 60, 0.7)", hover: "#e74c3c", highlight: "#c0392b" }, dashes: [5, 5], width: 2 }); 
             });
-            // Flechas para Rendir Regular (Violeta tenue y punteado -> Violeta vibrante en hover)
             if (reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { 
                 newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); 
             });
-            // Flechas para Rendir Aprobada (Violeta tenue y punteado -> Violeta vibrante en hover)
             if (reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { 
                 newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); 
             });
