@@ -1,45 +1,38 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-69ECCN213R"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-69ECCN213R');
-</script>
     <meta charset="UTF-8">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-69ECCN213R"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-69ECCN213R');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Planificador Interactivo - Prof. de Teatro UPC</title>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: row; margin: 0; padding: 0; height: 100vh; height: 100dvh; overflow: hidden; background-color: #f8f9fa;}
-        
         #mynetwork { flex-grow: 1; width: 100%; height: 100%; background-color: #ffffff; position: relative; z-index: 1;}
-        
         #panel { width: 360px; min-width: 360px; background: #fff; box-shadow: 3px 0 10px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 10; display: flex; flex-direction: column; overflow: hidden;}
         
         #drag-handle { display: none; width: 100%; padding: 12px 0; cursor: grab; justify-content: center; align-items: center; flex-shrink: 0; background: #fff; z-index: 20;}
         #drag-handle span { display: block; width: 45px; height: 6px; background: #bdc3c7; border-radius: 10px; }
         #drag-handle:active { cursor: grabbing; }
 
-        #panel-scroll-area { padding: 0 20px 20px 20px; overflow-y: auto; flex-grow: 1; }
+        #panel-scroll-area { padding: 15px 20px 20px 20px; overflow-y: auto; flex-grow: 1; }
 
-        h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 10px;}
+        h2 { color: #2c3e50; font-size: 18px; margin-top: 0; margin-bottom: 4px;}
+        .plan-badge { display: inline-block; background: #3498db; color: #fff; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-bottom: 10px; }
         h3 { color: #34495e; font-size: 14px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
-        
-        .plan-selector { background: #eef2f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 2px solid #b0bec5; }
-        .plan-selector label { font-size: 14px; font-weight: bold; color: #c0392b; display: block; margin-bottom: 10px; text-align: center;}
-        .plan-btn { width: 100%; padding: 8px; margin-bottom: 5px; cursor: pointer; border: 1px solid #bdc3c7; background: #fff; border-radius: 4px; font-size: 12px; transition: 0.2s;}
-        .plan-btn.active { background: #3498db; color: #fff; border-color: #2980b9; font-weight: bold;}
 
         .subject-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #eee; }
         .subject-item label { font-size: 13px; display: block; margin-bottom: 4px; font-weight: 600; color: #444;}
         .controls { font-size: 12px; display: flex; gap: 10px; }
         .controls label { font-weight: normal; cursor: pointer; }
-        .legend { margin-top: 15px; margin-bottom: 25px; font-size: 12px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e9ecef;}
+        .legend { margin-top: 10px; margin-bottom: 25px; font-size: 12px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e9ecef;}
         .leg-item { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;}
         .leg-border { border: 3px solid; background: #fff; box-sizing: border-box; border-radius: 3px;}
         .leg-bg { border-radius: 50%; border: 1px solid #ccc;}
@@ -53,11 +46,9 @@
 
         .credits { margin-top: 20px; text-align: center; font-size: 11px; color: #95a5a6; border-top: 1px solid #eee; padding-top: 10px; }
         
-        /* Estilos Responsivos Mejorados para Celulares (Bottom Sheet) */
         @media (max-width: 768px) {
             body { display: block; }
             #mynetwork { width: 100%; height: 100dvh; position: absolute; top: 0; left: 0; }
-            
             #panel { 
                 position: absolute; 
                 bottom: 0; 
@@ -80,14 +71,8 @@
     
     <div id="panel-scroll-area">
         <h2>Mi Trayectoria</h2>
-        
-        <div class="plan-selector">
-            <label>Elegir régimen de correlatividades 👇</label>
-            <button id="btn-2023" class="plan-btn active" onclick="switchPlan('2023')">Plan 2023 (Res. 0339 - Ingreso hasta 2025)</button>
-            <button id="btn-2025" class="plan-btn" onclick="switchPlan('2025')">Plan 2025 (Res. 441 - Ingreso 2026+)</button>
-        </div>
-
-        <p style="font-size: 11px; color: #7f8c8d; margin-bottom: 10px;">Tu progreso se guarda automáticamente.</p>
+        <div class="plan-badge">Régimen Res. 441-2025</div>
+        <p style="font-size: 11px; color: #7f8c8d; margin-top: 0; margin-bottom: 10px;">Tu progreso se guarda automáticamente.</p>
         
         <div class="legend">
             <h3>Estado de la Materia</h3>
@@ -111,7 +96,7 @@
         <div id="controls-container"></div>
         
         <div class="credits">
-            Desarrollado por Tino Velástico - Profesorado de Teatro UPC
+            Desarrollado por [Tu Nombre Aquí] - Profesorado de Teatro UPC
         </div>
     </div>
 </div>
@@ -119,11 +104,9 @@
 <div id="mynetwork"></div>
 
 <script>
-    // --- LÓGICA DEL PANEL DESLIZABLE (BOTTOM SHEET) ---
     const panel = document.getElementById('panel');
     const handle = document.getElementById('drag-handle');
-    let isDragging = false;
-    let startY, startHeight;
+    let isDragging = false, startY, startHeight;
 
     function startDrag(y) {
         isDragging = true;
@@ -133,30 +116,22 @@
 
     function onDrag(y) {
         if (!isDragging) return;
-        let deltaY = startY - y;
-        let newHeight = startHeight + deltaY;
+        let newHeight = startHeight + (startY - y);
         let windowHeight = window.innerHeight;
-        
         if (newHeight < 70) newHeight = 70;
         if (newHeight > windowHeight * 0.85) newHeight = windowHeight * 0.85;
-        
         panel.style.height = newHeight + 'px';
     }
 
-    function endDrag() {
-        isDragging = false;
-    }
+    function endDrag() { isDragging = false; }
 
     handle.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientY), {passive: true});
     document.addEventListener('touchmove', (e) => isDragging && onDrag(e.touches[0].clientY), {passive: true});
     document.addEventListener('touchend', endDrag);
-
     handle.addEventListener('mousedown', (e) => startDrag(e.clientY));
     document.addEventListener('mousemove', (e) => isDragging && onDrag(e.clientY));
     document.addEventListener('mouseup', endDrag);
 
-
-    // --- LÓGICA DEL PLAN DE ESTUDIOS ---
     const catColors = { comun: "#9E9E9E", practica: "#FF9800", especifica: "#2196F3", optativa: "#4CAF50" };
 
     const subjectsData = [
@@ -210,64 +185,34 @@
     ];
 
     const correlativas = {
-        "2023": { 
-            13: { reqCursarReg: [4], reqRendirApr: [1, 4] },
-            14: { reqCursarReg: [5], reqRendirApr: [5] },
-            17: { reqCursarReg: [6], reqRendirApr: [6] },
-            18: { reqCursarReg: [7], reqRendirApr: [7] },
-            19: { reqCursarReg: [8], reqRendirApr: [8] },
-            20: { reqCursarReg: [10] },
-            25: { reqCursarReg: [13], reqRendirApr: [11, 13, 21, 35] },
-            26: { reqCursarReg: [14], reqRendirApr: [14] },
-            27: { reqCursarApr: [20] },
-            28: { reqCursarReg: [14, 15, 19] },
-            29: { reqCursarReg: [17], reqRendirApr: [17] },
-            30: { reqCursarReg: [14, 18], reqRendirApr: [18] },
-            31: { reqCursarReg: [15, 19], reqRendirApr: [19] },
-            32: { reqCursarReg: [4, 14] },
-            33: { reqRendirApr: [16] },
-            34: { reqRendirApr: [10, 20] },
-            35: { reqCursarApr: [11], reqRendirApr: [21] },
-            39: { reqCursarReg: [24, 25, 27], reqCursarApr: [3], reqRendirApr: [25, 46] },
-            40: { reqCursarApr: [3] },
-            41: { reqCursarReg: [26, 28, 31], reqRendirReg: [43] },
-            42: { reqCursarReg: [26, 30], reqRendirApr: [26, 30] },
-            43: { reqCursarReg: [27, 28, 31] },
-            44: { reqCursarReg: [15, 30], reqRendirApr: [15, 30] },
-            45: { reqCursarReg: [32] },
-            46: { reqRendirApr: [35] }
-        },
-        "2025": { 
-            13: { reqCursarReg: [4], reqRendirApr: [1, 4] },
-            14: { reqCursarReg: [5], reqRendirApr: [5] },
-            16: { reqRendirApr: [3] },
-            17: { reqCursarReg: [6], reqRendirApr: [6] },
-            18: { reqCursarReg: [7], reqRendirApr: [7] },
-            19: { reqCursarReg: [8], reqRendirApr: [8] },
-            20: { reqCursarReg: [10] }, 
-            25: { reqCursarReg: [13], reqRendirApr: [11, 13, 21] },
-            26: { reqCursarReg: [14], reqRendirApr: [14] },
-            27: { reqCursarApr: [20] },
-            28: { reqCursarReg: [14, 15, 19] },
-            29: { reqCursarReg: [17], reqRendirApr: [17] },
-            30: { reqCursarReg: [18], reqRendirApr: [18] },
-            31: { reqCursarReg: [19], reqRendirApr: [19] },
-            32: { reqCursarApr: [5] },
-            33: { reqCursarApr: [3], reqRendirApr: [16] },
-            34: { reqCursarApr: [3], reqRendirApr: [16, 20] }, 
-            35: { reqCursarApr: [11], reqRendirApr: [21] },
-            39: { reqCursarReg: [24, 25, 27], reqRendirApr: [25] },
-            40: { reqCursarApr: [3] },
-            41: { reqCursarReg: [26, 31], reqCursarApr: [34] },
-            42: { reqCursarReg: [26, 30], reqRendirApr: [26, 30] },
-            43: { reqCursarReg: [27, 31] },
-            44: { reqCursarReg: [15], reqRendirApr: [15] },
-            45: { reqCursarReg: [32] },
-            46: { reqRendirApr: [35] }
-        }
+        13: { reqCursarReg: [4], reqRendirApr: [1, 4] },
+        14: { reqCursarReg: [5], reqRendirApr: [5] },
+        16: { reqRendirApr: [3] },
+        17: { reqCursarReg: [6], reqRendirApr: [6] },
+        18: { reqCursarReg: [7], reqRendirApr: [7] },
+        19: { reqCursarReg: [8], reqRendirApr: [8] },
+        20: { reqCursarReg: [10] }, 
+        25: { reqCursarReg: [13], reqRendirApr: [11, 13, 21] },
+        26: { reqCursarReg: [14], reqRendirApr: [14] },
+        27: { reqCursarApr: [20] },
+        28: { reqCursarReg: [14, 15, 19] },
+        29: { reqCursarReg: [17], reqRendirApr: [17] },
+        30: { reqCursarReg: [18], reqRendirApr: [18] },
+        31: { reqCursarReg: [19], reqRendirApr: [19] },
+        32: { reqCursarApr: [5] },
+        33: { reqCursarApr: [3], reqRendirApr: [16] },
+        34: { reqCursarApr: [3], reqRendirApr: [16, 20] }, 
+        35: { reqCursarApr: [11], reqRendirApr: [21] },
+        39: { reqCursarReg: [24, 25, 27], reqRendirApr: [25] },
+        40: { reqCursarApr: [3] },
+        41: { reqCursarReg: [26, 31], reqCursarApr: [34] },
+        42: { reqCursarReg: [26, 30], reqRendirApr: [26, 30] },
+        43: { reqCursarReg: [27, 31] },
+        44: { reqCursarReg: [15], reqRendirApr: [15] },
+        45: { reqCursarReg: [32] },
+        46: { reqRendirApr: [35] }
     };
 
-    let currentPlan = "2023";
     let studentState = {};
     let oldColors = {}; 
     let yearCounts = {1:0, 2:0, 3:0, 4:0};
@@ -283,16 +228,14 @@
     }
 
     function buildTooltipText(sub) {
-        let text = sub.label + "\n";
-        text += "Duración: " + sub.dur + "\n";
-        text += "----------------------------------------\n";
-        let reqs = correlativas[currentPlan][sub.id] || {};
+        let text = sub.label + "\nDuración: " + sub.dur + "\n----------------------------------------\n";
+        let reqs = correlativas[sub.id] || {};
         let hasReqs = false;
         if (reqs.reqCursarReg && reqs.reqCursarReg.length > 0) { text += "[Para Cursar] Regulares previas:\n  • " + reqs.reqCursarReg.map(id => getSubjectName(id)).join('\n  • ') + "\n\n"; hasReqs = true; }
         if (reqs.reqCursarApr && reqs.reqCursarApr.length > 0) { text += "[Para Cursar] Aprobadas previas:\n  • " + reqs.reqCursarApr.map(id => getSubjectName(id)).join('\n  • ') + "\n\n"; hasReqs = true; }
         if (reqs.reqRendirReg && reqs.reqRendirReg.length > 0) { text += "[Para Rendir] Regulares previas:\n  • " + reqs.reqRendirReg.map(id => getSubjectName(id)).join('\n  • ') + "\n"; hasReqs = true; }
         if (reqs.reqRendirApr && reqs.reqRendirApr.length > 0) { text += "[Para Rendir] Aprobadas previas:\n  • " + reqs.reqRendirApr.map(id => getSubjectName(id)).join('\n  • ') + "\n"; hasReqs = true; }
-        if (!hasReqs) text += "Sin correlativas previas en este Plan.";
+        if (!hasReqs) text += "Sin correlativas previas.";
         return text;
     }
 
@@ -317,19 +260,8 @@
     
     let options = {
         physics: false,
-        interaction: { 
-            dragNodes: false, // ¡Bloquea el movimiento de las materias!
-            hover: true, 
-            hoverConnectedEdges: true, 
-            selectConnectedEdges: true, 
-            tooltipDelay: 100 
-        },
-        edges: { 
-            smooth: { type: "cubicBezier", forceDirection: "horizontal", roundness: 0.5 }, 
-            hoverWidth: 3, 
-            selectionWidth: 3, 
-            arrows: { to: { enabled: true, scaleFactor: 0.6 } } 
-        },
+        interaction: { dragNodes: false, hover: true, hoverConnectedEdges: true, selectConnectedEdges: true, tooltipDelay: 100 },
+        edges: { smooth: { type: "cubicBezier", forceDirection: "horizontal", roundness: 0.5 }, hoverWidth: 3, selectionWidth: 3, arrows: { to: { enabled: true, scaleFactor: 0.6 } } },
         nodes: { shape: "box", borderWidth: 3, font: { size: 12, face: "Segoe UI", color: "#222", bold: true }, margin: { top: 10, right: 15, bottom: 10, left: 15 }, shadow: { enabled: true, color: "rgba(0,0,0,0.1)", size: 5, x: 2, y: 2 } }
     };
     let network = new vis.Network(containerNetwork, { nodes: nodes, edges: edges }, options);
@@ -337,10 +269,7 @@
     function calculateBgColor(subId, reqs) {
         let estado = studentState[subId];
         if (estado.aprobada) return "#4caf50"; 
-        
-        let canCursar = true;
-        let canRendir = estado.regular;
-        
+        let canCursar = true, canRendir = estado.regular;
         if(reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canCursar = false; });
         if(reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { if(!studentState[reqId].aprobada) canCursar = false; });
         if(reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { if(!studentState[reqId].regular && !studentState[reqId].aprobada) canRendir = false; });
@@ -353,75 +282,43 @@
     }
 
     function initNetwork() {
-        let newNodes = [];
-        let newEdges = [];
-
+        let newNodes = [], newEdges = [];
         subjectsData.forEach(sub => {
-            let reqs = correlativas[currentPlan][sub.id] || {};
+            let reqs = correlativas[sub.id] || {};
             let bgColor = calculateBgColor(sub.id, reqs);
             oldColors[sub.id] = bgColor;
 
-            let xPos = (sub.year - 2.5) * 350; 
-            let yPos = (sub.yIndex - (yearCounts[sub.year] / 2)) * 80;      
-
             newNodes.push({ 
                 id: sub.id, label: sub.label, title: buildTooltipText(sub), 
-                x: xPos, y: yPos,      
+                x: (sub.year - 2.5) * 350, y: (sub.yIndex - (yearCounts[sub.year] / 2)) * 80,      
                 shapeProperties: { borderDashes: sub.dur === 'Cuatrimestral' ? [5, 5] : false }, 
                 color: { background: bgColor, border: catColors[sub.cat], hover: { background: bgColor, border: "#e74c3c" }, highlight: { background: bgColor, border: "#c0392b" } }
             });
 
-            if (reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { 
-                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(176, 190, 197, 0.9)", hover: "#e74c3c", highlight: "#c0392b" }, width: 2 }); 
-            });
-            if (reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { 
-                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(231, 76, 60, 0.7)", hover: "#e74c3c", highlight: "#c0392b" }, dashes: [5, 5], width: 2 }); 
-            });
-            if (reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { 
-                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); 
-            });
-            if (reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { 
-                newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); 
-            });
+            if (reqs.reqCursarReg) reqs.reqCursarReg.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(176, 190, 197, 0.9)", hover: "#e74c3c", highlight: "#c0392b" }, width: 2 }); });
+            if (reqs.reqCursarApr) reqs.reqCursarApr.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(231, 76, 60, 0.7)", hover: "#e74c3c", highlight: "#c0392b" }, dashes: [5, 5], width: 2 }); });
+            if (reqs.reqRendirReg) reqs.reqRendirReg.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); });
+            if (reqs.reqRendirApr) reqs.reqRendirApr.forEach(reqId => { newEdges.push({ from: reqId, to: sub.id, color: { color: "rgba(156, 39, 176, 0.35)", hover: "#9c27b0", highlight: "#8e24aa" }, dashes: [2, 4], width: 1 }); });
         });
         
         nodes.clear(); edges.clear();
         nodes.add(newNodes); edges.add(newEdges);
-        
-        setTimeout(() => { 
-            network.redraw(); 
-            network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); 
-        }, 100);
+        setTimeout(() => { network.redraw(); network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } }); }, 100);
     }
 
     function updateStatesSilently() {
-        let updates = [];
-        let glowUpdates = [];
-        let revertUpdates = [];
-
+        let updates = [], glowUpdates = [], revertUpdates = [];
         subjectsData.forEach(sub => {
-            let reqs = correlativas[currentPlan][sub.id] || {};
+            let reqs = correlativas[sub.id] || {};
             let newBgColor = calculateBgColor(sub.id, reqs);
-
             if (oldColors[sub.id] !== newBgColor) {
-                glowUpdates.push({
-                    id: sub.id,
-                    color: { background: newBgColor, border: "#ffc107" },
-                    borderWidth: 6,
-                    shadow: { enabled: true, color: "#ffc107", size: 30, x: 0, y: 0 }
-                });
-                revertUpdates.push({
-                    id: sub.id,
-                    color: { background: newBgColor, border: catColors[sub.cat] },
-                    borderWidth: 3,
-                    shadow: { enabled: true, color: "rgba(0,0,0,0.1)", size: 5, x: 2, y: 2 }
-                });
+                glowUpdates.push({ id: sub.id, color: { background: newBgColor, border: "#ffc107" }, borderWidth: 6, shadow: { enabled: true, color: "#ffc107", size: 30, x: 0, y: 0 } });
+                revertUpdates.push({ id: sub.id, color: { background: newBgColor, border: catColors[sub.cat] }, borderWidth: 3, shadow: { enabled: true, color: "rgba(0,0,0,0.1)", size: 5, x: 2, y: 2 } });
                 oldColors[sub.id] = newBgColor;
             } else {
                 updates.push({ id: sub.id, color: { background: newBgColor }});
             }
         });
-
         nodes.update(updates);
         if (glowUpdates.length > 0) {
             nodes.update(glowUpdates);
@@ -432,29 +329,13 @@
     window.toggleState = function(id, type) {
         let isChecked = document.getElementById(`${type === 'regular' ? 'reg' : 'apr'}-${id}`).checked;
         studentState[id][type] = isChecked;
-        
-        if(type === 'aprobada' && isChecked) {
-            document.getElementById(`reg-${id}`).checked = true;
-            studentState[id].regular = true;
-        }
-        if(type === 'regular' && !isChecked) {
-            document.getElementById(`apr-${id}`).checked = false;
-            studentState[id].aprobada = false;
-        }
-        
+        if(type === 'aprobada' && isChecked) { document.getElementById(`reg-${id}`).checked = true; studentState[id].regular = true; }
+        if(type === 'regular' && !isChecked) { document.getElementById(`apr-${id}`).checked = false; studentState[id].aprobada = false; }
         localStorage.setItem('teatro_progress', JSON.stringify(studentState));
         updateStatesSilently();
-    };
-
-    window.switchPlan = function(plan) {
-        currentPlan = plan;
-        document.getElementById('btn-2023').className = plan === '2023' ? 'plan-btn active' : 'plan-btn';
-        document.getElementById('btn-2025').className = plan === '2025' ? 'plan-btn active' : 'plan-btn';
-        initNetwork(); 
     };
 
     initNetwork();
 </script>
 </body>
 </html>
-
